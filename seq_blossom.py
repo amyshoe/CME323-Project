@@ -1,5 +1,14 @@
 
 import networkx as nx
+def find_maximum_matching(G,M):
+    P = finding_aug_path(G,M)
+    if P == []:#Base Case
+        return M
+    else: #Augment P to M
+        ##Add the edges of P to M
+        for i in xrange(len(P)-1):
+            M.add_edge(P[i],P[i+1])
+        return find_maximum_matching(G,M)
 
 def dist_to_root(point,root,Graph):
     path = nx.shortest_path(Graph, source = point, target = root)
