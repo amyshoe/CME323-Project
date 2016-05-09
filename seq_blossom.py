@@ -1,6 +1,10 @@
 
 import networkx as nx
 
+def dist_to_root(point,root,Graph):
+    path = nx.shortest_path(Graph, source = point, target = root)
+    return (len(path)-1)
+    
 def finding_aug_path(G,M):
     Forest = [] #Storing the Forests
     Path = []# The final path - HOW DO WE STORE A PATH?? as a Graph in itself? List of Nodes!!
