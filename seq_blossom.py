@@ -120,8 +120,18 @@ def finding_aug_path(G,M,Blossom_stack):
                                 # check if blossom exists in aug_path
                                 v_B = Blossom_stack.pop()
                                 if (v_B in aug_path):
-                                    # find base of blossom TODO <------------
-                                        base
+                                    blossom.append(w)
+                                    # find base of blossom 
+                                    i = 0
+                                    base = None
+                                    while base == None or i > len(blossom) - 2:
+                                        if !(M.has_edge(blossom[i],blossom[i+1])):
+                                            if !(M.has_edge(blossom[i+1],blossom[i+2])):
+                                                base = blossom[i+1]
+                                            else:
+                                                i += 2
+                                        else:
+                                            i += 1
 
     								# lift
     								L_stem = aug_path[0:aug_path.index(v_B)]
