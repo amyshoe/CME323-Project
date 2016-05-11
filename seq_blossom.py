@@ -1,5 +1,6 @@
 
 import networkx as nx
+
 def find_maximum_matching(G,M):
     P = finding_aug_path(G,M)
     if P == []:#Base Case
@@ -15,15 +16,15 @@ def dist_to_root(point,root,Graph):
     return (len(path)-1)
     
 def generate_random_graph(n,density):
-	## n - number of nodes
-	## d - "density" of the graph [0,1]
-	graph = nx.Graph()
-	for i in xrange(n):
-		for j in xrange(i,n):
-			if np.random.uniform < density:
-				graph.add_edge(i,j)
+    ## n - number of nodes
+    ## d - "density" of the graph [0,1]
+    graph = nx.Graph()
+    for i in xrange(n):
+        for j in xrange(i,n):
+            if np.random.uniform < density:
+                graph.add_edge(i,j)
 
-	return graph 
+    return graph 
     
 def finding_aug_path(G,M,Blossom_stack):
     Forest = [] #Storing the Forests
@@ -98,24 +99,24 @@ def finding_aug_path(G,M,Blossom_stack):
                                 path_in_w = nx.shortest_path(Forest[tree_num_of_w], source = w, target = root_of_w)
                                 return path_in_w + path_in_v
                             else: ##Contract the blossom
-								# create blossom
-								blossom = nx.shortest_path(tree, source=v, target=w)
-								blossom.append(v)
+                                # create blossom
+                                blossom = nx.shortest_path(tree, source=v, target=w)
+                                blossom.append(v)
 
-								# contract blossom into single node w
-								contracted_G = G.copy()
-								contracted_M = M.copy()
-								for node in blossom:
+                                # contract blossom into single node w
+                                contracted_G = G.copy()
+                                contracted_M = M.copy()
+                                for node in blossom:
                                     if node != w:
-    									contracted_G = nx.contracted_nodes(contracted_G, w, node, self_loops=False)
-    									if node in contracted_M.nodes(): 
-    										contracted_M = nx.contracted_nodes(contracted_M, w, node, self_loops=False)
+                                        contracted_G = nx.contracted_nodes(contracted_G, w, node, self_loops=False)
+                                        if node in contracted_M.nodes(): 
+                                           contracted_M = nx.contracted_nodes(contracted_M, w, node, self_loops=False)
 
                                 # add blossom to our stack
                                 Blossom_stack.append(w)
 
-								# recurse
-								aug_path = find_augmenting_path(contracted_G, contracted_M, Blossom_stack)
+                                # recurse
+                                aug_path = find_augmenting_path(contracted_G, contracted_M, Blossom_stack)
 
                                 # check if blossom exists in aug_path
                                 v_B = Blossom_stack.pop()
@@ -124,36 +125,50 @@ def finding_aug_path(G,M,Blossom_stack):
                                     # find base of blossom 
                                     i = 0
                                     base = None
-                                    while base == None or i > len(blossom) - 2:
-                                        if !(M.has_edge(blossom[i],blossom[i+1])):
-                                            if !(M.has_edge(blossom[i+1],blossom[i+2])):
+                                    while base == None and i < len(blossom) - 1:
+                                        if not(M.has_edge(blossom[i],blossom[i+1])):
+                                            if not(M.has_edge(blossom[i+1],blossom[i+2])):
                                                 base = blossom[i+1]
                                             else:
                                                 i += 2
                                         else:
                                             i += 1
+                                    # create list of blossom nodes starting at base
+                                    based_blossom = [base]
+                                    base_idx = blossom.index(base)
+                                    for i in xrange(1,len(blossom)-base_idx):
+                                        based_blossom.append(blossom[base_idx + i])
+                                    for i in xrange(1,base_idx):
+                                        based_blossom.append(blossom[i])
 
-    								# lift
-    								L_stem = aug_path[0:aug_path.index(v_B)]
-    								R_stem = aug_path[aug_path.index(v_B)+1:]
+                                    # lift
+                                    L_stem = aug_path[0:aug_path.index(v_B)]
+                                    R_stem = aug_path[aug_path.index(v_B)+1:]
+                                    lifted_blossom = []
                                     if L_stem != []:
-                                        if M.has_edge(base,L_stem[-2]):
-                                            #do something --lift with base matched to left
-                                        else:
-                                            # lift, with base matched to right
-                                    else:
-                                        # lift, with base matched to right
-
-
-                                    i = blossom.index(base)
-                                    done = False
-                                    while (!done):
-                                        # case:
-                                        M.has_edge(blossom[i+1], blossom[i+2])
-
+                                        if M.has_edge(base,L_stem[-2]): # lift with base matched to left stem
+                                            # find where right stem attaches (or find that blossom is right endpt)
+                                            while (lifted_blossom == [] and i < len(based_blossom)-1):
+                                                if G.has_edge(based_blossom[i+2],R_stem[0]):
+                                                    lifted_blossom = based_blossom[:i+2]
+                                                i += 2
+                                            return L_stem + lifted_blossom + R_stem
+                                        else: # lift with base matched to right stem
+                                            # find where left stem attaches
+                                            while (lifted_blossom == [] and i < len(based_blossom)-1):
+                                                if G.has_edge(based_blossom[i+2],L_stem[-2]):
+                                                    lifted_blossom = based_blossom[:i+2]
+                                                i += 2
+                                            return R_stem.reverse() + lifted_blossom + L_stem.reverse()
+                                    else: # blossom is left endpt
+                                        while (lifted_blossom == [] and i < len(based_blossom)-1):
+                                            if G.has_edge(based_blossom[i+2],L_stem[-2]):
+                                                lifted_blossom = based_blossom[:i+2]
+                                            i += 2
+                                        return R_stem.reverse() + lifted_blossom
 
                                 else: # blossom is not in aug_path
-        							return aug_path
+                                    return aug_path
                                 
                 ##Mark the Edge e
                 unmarked_edges[edge_number] = []
