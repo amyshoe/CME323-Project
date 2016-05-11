@@ -1,5 +1,6 @@
 
 import networkx as nx
+import numpy as np
 
 def find_maximum_matching(G,M):
     P = finding_aug_path(G,M)
@@ -15,7 +16,7 @@ def dist_to_root(point,root,Graph):
     path = nx.shortest_path(Graph, source = point, target = root)
     return (len(path)-1)
     
-def generate_random_graph(n,density):
+def generate_random_graph(n,density=0.5):
     ## n - number of nodes
     ## d - "density" of the graph [0,1]
     graph = nx.Graph()
@@ -31,7 +32,7 @@ def finding_aug_path(G,M,Blossom_stack):
     Path = [] # The final path 
 
     unmarked_edges = list(set(G.edges()) - set(M.edges()))
-    unmarked_nodes = G.nodes()
+    unmarked_nodes = list(G.nodes())
     ## we need a map from v to the tree
     tree_to_root = {} # key=idx of tree in forest, val=root
     root_to_tree = {} # key=root, val=idx of tree in forest
@@ -116,7 +117,7 @@ def finding_aug_path(G,M,Blossom_stack):
                                 Blossom_stack.append(w)
 
                                 # recurse
-                                aug_path = find_augmenting_path(contracted_G, contracted_M, Blossom_stack)
+                                aug_path = finding_aug_path(contracted_G, contracted_M, Blossom_stack)
 
                                 # check if blossom exists in aug_path
                                 v_B = Blossom_stack.pop()
@@ -178,6 +179,14 @@ def finding_aug_path(G,M,Blossom_stack):
         
         ##IF Nothing is Found
         return Path ##Empty Path
+
+if __name__ == '__main__':
+    G = generate_random_graph(3, 1)
+    M = nx.Graph()
+    Blossom_stack = []
+    P = finding_aug_path(G, M, Blossom_stack)
+    print P
+
                     
                             
                             
