@@ -27,8 +27,8 @@ def generate_random_graph(n,density=0.5):
 
     return graph 
     
-def finding_aug_path(G,M,Blossom_stack):
-    print 'finding aug path was called\n G: ', G.nodes(), "\n M:",M.nodes()
+def finding_aug_path(G,M,Blossom_stack=[]):
+    print 'finding aug path was called\n G: ', list(G.nodes()), "\n M:", list(M.nodes())
     Forest = [] #Storing the Forests
     Path = [] # The final path 
 
@@ -200,10 +200,10 @@ def finding_aug_path(G,M,Blossom_stack):
         return Path ##Empty Path
 
 if __name__ == '__main__':
-    G = generate_random_graph(500)
+    G = generate_random_graph(50)
     M = nx.Graph()
     Blossom_stack = []
-    P = finding_aug_path(G, M, Blossom_stack)
+    P = find_maximum_matching(G, M)
     print P
 
                     
