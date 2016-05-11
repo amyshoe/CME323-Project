@@ -24,7 +24,7 @@ def generate_random_graph(n,density=0.5):
         for j in xrange(i,n):
             if np.random.uniform < density:
                 graph.add_edge(i,j)
-
+    print "graph nodes: ", list(graph.nodes())
     return graph 
     
 def finding_aug_path(G,M,Blossom_stack=[]):
@@ -57,21 +57,21 @@ def finding_aug_path(G,M,Blossom_stack=[]):
         counter = counter + 1
 
     
-       for v in Forest_nodes: ##TODO: add while loop!!!!!!!
-        
-        root_of_v = None
-        tree_number_of_v = None
-        for tree_number in xrange(len(Forest)):
-            tree_in = Forest[tree_number]
-            if tree_in.has_node(v) == True:
-                root_of_v = tree_to_root[tree_number]
-                tree_num_of_v = tree_number
-                break #Break out of the for loop
+        for v in Forest_nodes: 
+            print "Entered main for loop"
+            root_of_v = None
+            tree_number_of_v = None
+            for tree_number in xrange(len(Forest)):
+                print "Entered tree num for loop"
+                tree_in = Forest[tree_number]
+                if tree_in.has_node(v) == True:
+                    root_of_v = tree_to_root[tree_number]
+                    tree_num_of_v = tree_number
+                    break #Break out of the for loop
                 
-        
-            ##Do something
             edges_v = Forest[tree_number_of_v].edges(v)
             for edge_number in xrange(len(edges_v)):
+                print "Entered edge num for loop"
                 e = edges_v[edge_number]
                 if (e in unmarked_edges and e!=[]):
                     w = e[1] # the other vertex of the unmarked edge
@@ -80,6 +80,7 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                 ##Go through all the trees in the forest to check if w in F
                 tree_of_w = None
                 for tree_number in xrange(len(Forest)):
+                    print "Checking if w in F"
                     tree = Forest[tree_number]
                     if tree.has_node(w) == True:
                         w_in_Forest = 1
@@ -89,6 +90,7 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                         break #Break the outer for loop
                 
                 if w_in_Forest ==  0:
+                    print "w not in Forest"
                     ##w is matched, so add e and w's matched edge to F
                     Forest[tree_num_of_v].add_edge(e)#edge {v,w}
                     edge_w = M.edges(w) #get edge {w,x}
@@ -97,8 +99,10 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                     Forest_nodes.append(edge_w[0][1]) ##add {x} to the list of forest nodes
 
                 else: ## w is in Forest
+                    print "w in Forest"
                     # if odd, do nothing.
                     if dist_to_root(w,root_of_w,Forest[tree_num_of_w])%2 == 0:
+                        print "dist to root is even"
                         if (tree_num_of_v != tree_num_of_w):
                             ##Shortest path from root(v)--->v-->w---->root(w)
                             path_in_v = nx.shortest_path(Forest[tree_num_of_v], source = root_of_v, target = v)
