@@ -28,17 +28,20 @@ def generate_random_graph(n,density=0.5):
     return graph 
     
 def finding_aug_path(G,M,Blossom_stack):
+    print 'finding aug path was called\n G: ', G.nodes(), "\n M:",M.nodes()
     Forest = [] #Storing the Forests
     Path = [] # The final path 
 
     unmarked_edges = list(set(G.edges()) - set(M.edges()))
     unmarked_nodes = list(G.nodes())
+    Forest_nodes = []
     ## we need a map from v to the tree
     tree_to_root = {} # key=idx of tree in forest, val=root
     root_to_tree = {} # key=root, val=idx of tree in forest
         
     ##List of exposed vertices - ROOTS OF TREES
     exp_vertex = list(set(G.nodes()) - set(M.nodes()))
+    print "\n Exposed vertices:", exp_vertex
     
     counter = 0
     #List of trees with the exposed vertices as the roots
@@ -46,6 +49,7 @@ def finding_aug_path(G,M,Blossom_stack):
         temp = nx.Graph()
         temp.add_node(v)
         Forest.append(temp)
+        Forest_nodes.append(v)
         
         #link each root to its tree
         tree_to_root[counter] = v
@@ -53,21 +57,19 @@ def finding_aug_path(G,M,Blossom_stack):
         counter = counter + 1
 
     
-    for vertex_number in xrange(len(unmarked_nodes)): ##TODO: add while loop!!!!!!!
-        v = unmarked_nodes[vertex_number]
-        in_Forest = 0; #boolean for if unmarked v is 'within the forest or not'
+    for v in Forest_nodes: ##TODO: add while loop!!!!!!!
+        #v = unmarked_nodes[vertex_number]
+        #in_Forest = 0; #boolean for if unmarked v is 'within the forest or not'
         root_of_v = None
         tree_number_of_v = None
         for tree_number in xrange(len(Forest)):
             tree_in = Forest[tree_number]
             if tree_in.has_node(v) == True:
-                in_Forest = 1
                 root_of_v = tree_to_root[tree_number]
                 tree_num_of_v = tree_number
                 break #Break out of the for loop
                 
         
-        if (in_Forest==1 and dist_to_root(v,root_of_v,Forest[node_to_tree[v]])%2 == 0):
             ##Do something
             edges_v = Forest[tree_number_of_v].edges(v)
             for edge_number in xrange(len(edges_v)):
@@ -91,6 +93,9 @@ def finding_aug_path(G,M,Blossom_stack):
                         Forest[tree_num_of_v].add_edge(e)#edge {v,w}
                         edge_w = M.edges(w) #get edge {w,x}
                         Forest[tree_num_of_v].add_edge(edge_w)#add edge{w,x}
+                        
+                        Forest_nodes.append(edges_w[0][1]) ##add {x} to the list of forest nodes
+
                     else: ## w is in Forest
                         # if odd, do nothing.
                         if dist_to_root(w,root_of_w,Forest[tree_num_of_w])%2 == 0:
