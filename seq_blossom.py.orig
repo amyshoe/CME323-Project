@@ -56,10 +56,16 @@ def finding_aug_path(G,M,Blossom_stack):
         root_to_tree[v] = counter
         counter = counter + 1
 
+<<<<<<< HEAD
     
+    for v in Forest_nodes: ##TODO: add while loop!!!!!!!
+        #v = unmarked_nodes[vertex_number]
+        #in_Forest = 0; #boolean for if unmarked v is 'within the forest or not'
+=======
     for vertex_number in xrange(len(unmarked_nodes)): ##TODO: add while loop!!!!!!!
         v = unmarked_nodes[vertex_number]
         in_Forest = 0; #boolean for if unmarked v is 'within the forest or not'
+>>>>>>> 0f9f049d00ef2e11ec41bda884c3bbe138413ddf
         root_of_v = None
         tree_number_of_v = None
         for tree_number in xrange(len(Forest)):
