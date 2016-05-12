@@ -8,12 +8,13 @@ def find_maximum_matching(G,M):
         print "Base Case: print M" 
         return M.edges()
     else: #Augment P to M
+        print " P is:",P,"\n M is :",M.edges()
+
         ##Add the edges of P to M
         for i in xrange(0,len(P)-2,2):
             M.add_edge(P[i],P[i+1])
             M.remove_edge(P[i+1],P[i+2])
         M.add_edge(P[len(P)-2],P[len(P)-1])
-        print " P is:",P,"\n M is :",M.edges()
         return find_maximum_matching(G,M)
 
 def dist_to_root(point,root,Graph):
@@ -136,7 +137,8 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                             contracted_G = G.copy()
                             contracted_M = M.copy()
                             w_old = w + 0
-                            for node in blossom:
+                            print "w is :", w
+                            for node in blossom[0:len(blossom)-1]:
                                 if node != w_old:
                                     contracted_G = nx.contracted_nodes(contracted_G, w, node, self_loops=False)
                                     print "here it is"
@@ -231,6 +233,7 @@ if __name__ == '__main__':
     Blossom_stack = []
     MM = find_maximum_matching(G, M)
     print "Here it is M:" ,MM
+    print "Here is the Graph:", G.edges()
 
                     
                             
