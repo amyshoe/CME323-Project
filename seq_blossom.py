@@ -182,21 +182,24 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                                     if not(M.has_edge(blossom[i],blossom[i+1])):
                                         if not(M.has_edge(blossom[i+1],blossom_ext[i+2])): # <-- needed here
                                             base = blossom[i+1]
-                                            base_idx = i
+                                            base_idx = i+1
                                         else:
                                             i += 2
                                     else:
                                         i += 1
 
                                 # create list of blossom nodes starting at base
-                                based_blossom = [base]
+                                based_blossom = []
                                 ##base_idx = blossom.index(base) - computed in the For loop
-                                for i in xrange(1,len(blossom)-base_idx):
-                                    based_blossom.append(blossom[base_idx + i])
-                                for i in xrange(1,base_idx):
+                                for i in xrange(base_idx,len(blossom)-1):
                                     based_blossom.append(blossom[i])
-                                    
+
+                                for i in xrange(0,base_idx):
+                                    based_blossom.append(blossom[i])
+                                based_blossom.append(base)
+
                                 print "Base: ", base
+                                print "base index in original:", base_idx
                                 print "Blossom base-ified: ", based_blossom
                                 print "original Blossom is:", blossom 
 
@@ -236,14 +239,14 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                                     else: # Base connected to Right stem
                                         # find where left stem attaches
                                         while (lifted_blossom == [] and i < len(based_blossom)-1):
-                                            if G.has_edge(based_blossom[i+2],L_stem[-2]):
+                                            if G.has_edge(based_blossom[i+2],L_stem[-1]):
                                                 lifted_blossom = based_blossom[:i+2]
                                             i += 2
                                         print "R+lift+L; here's lift: ", lifted_blossom
                                         return R_stem.reverse() + lifted_blossom + L_stem.reverse()
                                 else: # blossom is left endpt
                                     while (lifted_blossom == [] and i < len(based_blossom)-1):
-                                        if G.has_edge(based_blossom[i+2],L_stem[-2]):
+                                        if G.has_edge(based_blossom[i+2],L_stem[-1]):
                                             lifted_blossom = based_blossom[:i+2]
                                         i += 2
                                     print "R+lift; here's lift: ", lifted_blossom
