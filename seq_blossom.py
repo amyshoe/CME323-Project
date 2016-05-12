@@ -10,12 +10,14 @@ def find_maximum_matching(G,M):
     else: #Augment P to M
         print " P is:",P,"\n M is :", list(M.edges())
 
-        ##Add the edges of P to M
+        ##Add the alternating edges of P to M
         for i in xrange(0,len(P)-2,2):
             M.add_edge(P[i],P[i+1])
-            assert(M.has_edge(P[i+1],P[i+2]))
-            M.remove_edge(P[i+1],P[i+2])
-        M.add_edge(P[len(P)-2],P[len(P)-1])
+            if (M.has_edge(P[i+1],P[i+2])): ## <-----------------------------sketch central
+                M.remove_edge(P[i+1],P[i+2])
+            else:
+                print "warning..."
+        M.add_edge(P[-2],P[-1])
         print "M after adding path:", list(M.edges())
         return find_maximum_matching(G,M)
 
@@ -105,14 +107,19 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                 print "w in Forest?: ", w_in_Forest
                 if w_in_Forest == 0:
                     print "w not in Forest"
+                    ## w is matched, so add e and w's matched edge to F
+                    Forest[tree_num_of_v].add_edge(e[0],e[1]) # edge {v,w}
+                    print "edge added to forest: ", e
+                    # Note: we don't add w to forest nodes b/c it's odd dist from root
                     assert(M.has_node(w))
-                    ##w is matched, so add e and w's matched edge to F
-                    Forest[tree_num_of_v].add_edge(e[0],e[1])#edge {v,w}
-                    edge_w = list(M.edges(w))[0] #get edge {w,x}
-                    print "edge to add to forest: ", edge_w
-                    Forest[tree_num_of_v].add_edge(edge_w[0],edge_w[1])#add edge{w,x}
-                    
-                    Forest_nodes.append(edge_w[1]) ##add {x} to the list of forest nodes
+                    print "Nodes of M: ", list(M.nodes())
+                    assert(list(M.edges(w)) != [])
+                    print "Edges of M incident to w: ", list(M.edges(w))
+                    edge_w = list(M.edges(w))[0] # get edge {w,x}
+                    Forest[tree_num_of_v].add_edge(edge_w[0],edge_w[1]) # add edge{w,x}
+                    print "edge added to forest: ", edge_w
+                    Forest_nodes.append(edge_w[1]) ## add {x} to the list of forest nodes
+                    print "node added to forest: ", edge_w[1]
 
                 else: ## w is in Forest
                     print "w in Forest"
@@ -128,7 +135,7 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                             return path_in_w + path_in_v
                         #w = e[0][1] # the other vertex of the unmarked edge
                         else: ##Contract the blossom
-                            print "BLOOOOOOOOOOSSSSSSSOOOOOOMMMMMMMMMM"
+                            print "\nBLOOOOOOOOOOSSSSSSSOOOOOOMMMMMMMMMM\n"
                             # create blossom
                             blossom = nx.shortest_path(tree_of_w, source=v, target=w)
                             blossom.append(v)
@@ -170,15 +177,18 @@ def finding_aug_path(G,M,Blossom_stack=[]):
 
                             # recurse
                             aug_path = finding_aug_path(contracted_G, contracted_M, Blossom_stack)
+                            print "\t \t ~~~"
                             print "Blossom_stack after recursion: ", Blossom_stack
                             print "Augmented path after recursion: ", aug_path
+
+                            # Augment aug_path to M
+                            print "Augmented path is:", aug_path, "\n M is:", list(M.edges())
 
                             # check if blossom exists in aug_path 
                             v_B = Blossom_stack.pop()
                             if (v_B in aug_path):
                                 #blossom.append(w) ### - WHY ARE WE DOING THIS???? w is inside the blossom anyway??
                                 print "Blossom_stack after pop: ", Blossom_stack
-                                print "Blossom in aug path: ", blossom
 
                                 # find base of blossom 
                                 i = 0
@@ -194,25 +204,44 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                                             i += 2
                                     else:
                                         i += 1
+                                print "Blossom is: ", blossom
+                                print "\tBlossom base is: ", base
 
-                                # create list of blossom nodes starting at base
-                                based_blossom = []
-                                ##base_idx = blossom.index(base) - computed in the For loop
-                                for i in xrange(base_idx,len(blossom)-1):
-                                    based_blossom.append(blossom[i])
+                                # if needed, create list of blossom nodes starting at base
+                                if blossom[0] != base:
+                                    based_blossom = []
+                                    base_idx = blossom.index(base)
+                                    for i in xrange(base_idx,len(blossom)-1):
+                                        based_blossom.append(blossom[i])
+                                    for i in xrange(0,base_idx):
+                                        based_blossom.append(blossom[i])
+                                    based_blossom.append(base)
+                                    print "\tbase index in original:", base_idx
+                                    print "\tBlossom base-ified: ", based_blossom
+                                    print "\toriginal Blossom is:", blossom 
+                                else:
+                                    based_blossom = blossom
 
-                                for i in xrange(0,base_idx):
-                                    based_blossom.append(blossom[i])
-                                based_blossom.append(base)
 
-                                print "Base: ", base
-                                print "base index in original:", base_idx
-                                print "Blossom base-ified: ", based_blossom
-                                print "original Blossom is:", blossom 
+                                # replace v_B representative (w) with base
+                                aug_path[aug_path.index(v_B)] = base
+                                print "basified aug path: ", aug_path
 
-                                # lift - v_B is the BLossom node
-                                L_stem = aug_path[0:aug_path.index(v_B)]
-                                R_stem = aug_path[aug_path.index(v_B)+1:]
+                                ## massage into aug_path??????????? <------------------------------------------------sketch central
+                                for i in xrange(0,len(aug_path)-2,2):
+                                    M.add_edge(aug_path[i+1],aug_path[i+2])
+                                    if (M.has_edge(aug_path[i],aug_path[i+1])):
+                                        M.remove_edge(aug_path[i],aug_path[i+1])
+                                    else:
+                                        print "warning..."
+                                    # M.add_edge(aug_path[i],aug_path[i+1])
+                                    # assert(M.has_edge(aug_path[i+1],aug_path[i+2]))
+                                    # M.remove_edge(aug_path[i+1],aug_path[i+2])
+                                print "M after adding path:", list(M.edges())
+                                
+                                # lift - base (previously v_B) is the BLossom node
+                                L_stem = aug_path[0:aug_path.index(base)]
+                                R_stem = aug_path[aug_path.index(base)+1:]
                                 print "L_stem: ", L_stem
                                 print "R_stem: ", R_stem
                                 lifted_blossom = [] #stores the path within the blossom to take
@@ -224,7 +253,7 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                                         # find where right stem attaches (or find that blossom is right endpt)
 
                                         # if blossom is R endpt
-                                        if R == []: 
+                                        if R_stem == []: 
                                             print "Blossom is R endpt"
                                             lifted_blossom = based_blossom[:-1] # we just need the node-disjoint path
                                         
@@ -238,7 +267,7 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                                                     if i%2 == 0: # same dir path
                                                         lifted_blossom = based_blossom[:i+1]
                                                     else: # opposite dir path
-                                                        lifted_blossom = reversed(based_blossom[:i-1])
+                                                        lifted_blossom = list(reversed(based_blossom[:i-1]))
                                                 i += 1
 
                                         #### I think now the above covers the case of going around
@@ -309,9 +338,10 @@ def finding_aug_path(G,M,Blossom_stack=[]):
     return Path ##Empty Path
 
 if __name__ == '__main__':
-    G = generate_random_graph(10,0.25)
+    G = generate_random_graph(20,0.75)
     M = nx.Graph()
     Blossom_stack = []
+    print "This is our graph: ", list(G.edges())
     MM = find_maximum_matching(G, M)
     print "Here it is M edges:", list(MM.edges())
     print "Here is the Graph:", list(G.edges())
