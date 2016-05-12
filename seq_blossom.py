@@ -5,17 +5,18 @@ import numpy as np
 def find_maximum_matching(G,M):
     P = finding_aug_path(G,M)
     if P == []:#Base Case
-        print "Base Case: print M" 
-        return M.edges()
+        print "Base Case: ", list(M.edges()) 
+        return M
     else: #Augment P to M
-        print " P is:",P,"\n M is :",M.edges()
+        print " P is:",P,"\n M is :", list(M.edges())
 
         ##Add the edges of P to M
         for i in xrange(0,len(P)-2,2):
             M.add_edge(P[i],P[i+1])
+            assert(M.has_edge(P[i+1],P[i+2]))
             M.remove_edge(P[i+1],P[i+2])
         M.add_edge(P[len(P)-2],P[len(P)-1])
-        print "M after adding path:", M.edges()
+        print "M after adding path:", list(M.edges())
         return find_maximum_matching(G,M)
 
 def dist_to_root(point,root,Graph):
@@ -86,7 +87,7 @@ def finding_aug_path(G,M,Blossom_stack=[]):
             if ((e in unmarked_edges or e2 in unmarked_edges) and e!=[]):
                 w = e[1] # the other vertex of the unmarked edge
                 w_in_Forest = 0; ##Indicator for w in F or not
-                print "here's w", w
+                print "here's w: ", w
 
                 ##Go through all the trees in the forest to check if w in F
                 tree_of_w = None
@@ -104,10 +105,11 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                 print "w in Forest?: ", w_in_Forest
                 if w_in_Forest == 0:
                     print "w not in Forest"
+                    assert(M.has_node(w))
                     ##w is matched, so add e and w's matched edge to F
                     Forest[tree_num_of_v].add_edge(e[0],e[1])#edge {v,w}
-                    edge_w = M.edges(w)[0] #get edge {w,x}
-                    print edge_w
+                    edge_w = list(M.edges(w))[0] #get edge {w,x}
+                    print "edge to add to forest: ", edge_w
                     Forest[tree_num_of_v].add_edge(edge_w[0],edge_w[1])#add edge{w,x}
                     
                     Forest_nodes.append(edge_w[1]) ##add {x} to the list of forest nodes
@@ -126,31 +128,35 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                             return path_in_w + path_in_v
                         #w = e[0][1] # the other vertex of the unmarked edge
                         else: ##Contract the blossom
-                            print "returning an empty list--------> @ Blossom right now"
                             print "BLOOOOOOOOOOSSSSSSSOOOOOOMMMMMMMMMM"
                             # create blossom
                             blossom = nx.shortest_path(tree_of_w, source=v, target=w)
                             blossom.append(v)
                             print "Blossom created: ", blossom
+                            assert(len(blossom)%2 == 0)
 
                             # contract blossom into single node w
                             contracted_G = G.copy()
                             contracted_M = M.copy()
                             w_old = w + 0
-                            print "w is :", w
+                            print "w is: ", w
                             for node in blossom[0:len(blossom)-1]:
                                 print "\t Blossom node: ", node
                                 if node != w_old:
                                     contracted_G = nx.contracted_nodes(contracted_G, w, node, self_loops=False)
-                                    print "here it is"
+                                    print "contracted", node, "into", w
                                     if node in contracted_M.nodes(): 
                                        #contracted_M = nx.contracted_nodes(contracted_M, w, node, self_loops=False)
-                                       print "is it here"
-                                       edge_rm = M.edges(node)
+                                       print "removing", node, "from M"
+                                       edge_rm = list(M.edges(node))[0] #this will be exactly one edge
+                                       print "and also", edge_rm[1], "from M"
+                                       print "edges = ", list(M.edges(node))
+                                       print "edge rm = ", edge_rm
                                        contracted_M.remove_node(node)
-                                       contracted_M.remove_node(edge_rm[0][1])
+                                       contracted_M.remove_node(edge_rm[1])
 
-                            print "M : ",M.nodes(),"\nContracted_M :",contracted_M.nodes()
+                            print "M:", list(M.nodes()),"\nContracted_M:", list(contracted_M.nodes())
+                            print "M:", list(M.edges()),"\nContracted_M:", list(contracted_M.edges())
                             ## Go through the edges in the blossom and contract the ones in the matching
                             #for i in xrange(len(blossom)-1):
                             #    node = blossom[i]
@@ -165,6 +171,7 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                             # recurse
                             aug_path = finding_aug_path(contracted_G, contracted_M, Blossom_stack)
                             print "Blossom_stack after recursion: ", Blossom_stack
+                            print "Augmented path after recursion: ", aug_path
 
                             # check if blossom exists in aug_path 
                             v_B = Blossom_stack.pop()
@@ -210,47 +217,82 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                                 print "R_stem: ", R_stem
                                 lifted_blossom = [] #stores the path within the blossom to take
 
-                                ##NEED TO REWRITE THIS L_stem [-2] need not exist!!
-                                if L_stem != []:
+                                # blossom is not L endpt
+                                if L_stem != []: 
+                                    print "Blossom is not L endpt"
                                     if M.has_edge(base,L_stem[-1]): # Base connected to Left stem
-                                        # find the first pt at which its connected to the right side
                                         # find where right stem attaches (or find that blossom is right endpt)
 
-                                        ##check in one direction
-                                        if R==[]:
-                                            lifted_blossom = based_bloss[:3] # we just need the first two edges and we are done
-                                        i = 0
-                                        while (lifted_blossom == [] and i < len(based_blossom and R!=[])):
-                                            if G.has_edge(based_blossom[i+2],R_stem[0]):
-                                                lifted_blossom = based_blossom[:i+2]
-                                                break #we found the place of connection
-                                            i += 2
-                                        #Check in the other direction
-                                        i = len(blossom)-2
-                                        while (lifted_blossom == [] and i > 0 and R!=[]):
-                                            if G.has_edge(based_blossom[i],R_stem[0]):
-                                                lifted_blossom = based_blossom[:i+2]
-                                                break #we found the place of connection
-                                            i -= 2
+                                        # if blossom is R endpt
+                                        if R == []: 
+                                            print "Blossom is R endpt"
+                                            lifted_blossom = based_blossom[:-1] # we just need the node-disjoint path
+                                        
+                                        # if blossom is not L or R endpt:
+                                        else:
+                                            print "Blossom is neither L nor R endpt"
+                                            i = 1 
+                                            while (lifted_blossom == [] and i < len(based_blossom)-1):
+                                                if G.has_edge(based_blossom[i],R_stem[0]):
+                                                    # make sure we're adding the even part to lifted path
+                                                    if i%2 == 0: # same dir path
+                                                        lifted_blossom = based_blossom[:i+1]
+                                                    else: # opposite dir path
+                                                        lifted_blossom = reversed(based_blossom[:i-1])
+                                                i += 1
 
+                                        #### I think now the above covers the case of going around
+                                        #### the blossom in the other direction, which below
+                                        #### attempted to do
+
+                                        # #Check in the other direction
+                                        # i = len(blossom)-2
+                                        # while (lifted_blossom == [] and i > 0 and R!=[]):
+                                        #     if G.has_edge(based_blossom[i],R_stem[0]):
+                                        #         lifted_blossom = based_blossom[:i+2]
+                                        #         break #we found the place of connection
+                                        #     i -= 2
 
                                         print "L+lift+R; here's lift: ", lifted_blossom
+                                        print "Is R empty? Here's R: ", R_stem
+                                        print "Here's the return: ", L_stem + lifted_blossom + R_stem
                                         return L_stem + lifted_blossom + R_stem
-                                    else: # Base connected to Right stem
-                                        # find where left stem attaches
-                                        while (lifted_blossom == [] and i < len(based_blossom)-1):
-                                            if G.has_edge(based_blossom[i+2],L_stem[-1]):
-                                                lifted_blossom = based_blossom[:i+2]
-                                            i += 2
-                                        print "R+lift+L; here's lift: ", lifted_blossom
-                                        return R_stem.reverse() + lifted_blossom + L_stem.reverse()
-                                else: # blossom is left endpt
-                                    while (lifted_blossom == [] and i < len(based_blossom)-1):
-                                        if G.has_edge(based_blossom[i+2],L_stem[-1]):
-                                            lifted_blossom = based_blossom[:i+2]
-                                        i += 2
+
+                                    else: # Base connected to Right stem (or is R endpt apparently??? shouldn't that be impossible)
+
+                                        assert(not M.has_edge(base, L_stem[-1]))
+                                        
+                                        # blossom is R endpt?????
+                                        if R_stem == []:
+                                            print "Blossom is R endpt???"
+                                            lifted_blossom = based_blossom[:-1] # we just need the node-disjoint path
+                                            print "Is R empty? Here's R: ", R_stem
+                                            print "Here's the return: ", L_stem + lifted_blossom
+                                            return L_stem + lifted_blossom
+
+                                        # blossom is in the middle, base at right: find where left stem attaches
+                                        else:
+                                            print "Blossom is neither L nor R endpt"
+                                            i = 1
+                                            while (lifted_blossom == [] and i < len(based_blossom)-1):
+                                                if G.has_edge(based_blossom[i],L_stem[-1]):
+                                                    # make sure we're adding the even part to lifted path
+                                                    if i%2 == 0: # same dir path
+                                                        lifted_blossom = based_blossom[:i+1]
+                                                    else: # opposite dir path
+                                                        lifted_blossom = list(reversed(based_blossom[:i-1]))
+                                                i += 1
+                                            print "R+lift+L; here's lift: ", lifted_blossom
+                                            print "Heres the return:", list(reversed(R_stem)) + lifted_blossom + list(reversed(L_stem))
+                                            return list(reversed(R_stem)) + lifted_blossom + list(reversed(L_stem))
+                                
+                                # blossom is left endpt, so base must be connected to R_stem
+                                else: 
+                                    print "Blossom is L endpt"
+                                    lifted_blossom = based_blossom[:-1] # we just need the node-disjoint path
                                     print "R+lift; here's lift: ", lifted_blossom
-                                    return R_stem.reverse() + lifted_blossom
+                                    print "Heres the return:", list(reversed(lifted_blossom)) + R_stem
+                                    return list(reversed(lifted_blossom)) + R_stem
 
                             else: # blossom is not in aug_path
                                 print "Blossom not in aug path"
@@ -267,12 +309,12 @@ def finding_aug_path(G,M,Blossom_stack=[]):
     return Path ##Empty Path
 
 if __name__ == '__main__':
-    G = generate_random_graph(10,0.5)
+    G = generate_random_graph(10,0.25)
     M = nx.Graph()
     Blossom_stack = []
     MM = find_maximum_matching(G, M)
-    print "Here it is M:" ,MM
-    print "Here is the Graph:", G.edges()
+    print "Here it is M edges:", list(MM.edges())
+    print "Here is the Graph:", list(G.edges())
 
                     
                             
