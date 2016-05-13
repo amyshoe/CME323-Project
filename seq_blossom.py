@@ -1,6 +1,7 @@
 
 import networkx as nx
 import numpy as np
+import copy
 
 def find_maximum_matching(G,M):
     P = finding_aug_path(G,M)
@@ -126,9 +127,9 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                             ##Shortest path from root(v)--->v-->w---->root(w)
                             path_in_v = nx.shortest_path(Forest[tree_num_of_v], source = root_of_v, target = v)
                             path_in_w = nx.shortest_path(Forest[tree_num_of_w], source = w, target = root_of_w)
-                            print "Path is:", path_in_w + path_in_v
+                            print "Path is:", path_in_v + path_in_w
 
-                            return path_in_w + path_in_v
+                            return path_in_v + path_in_w
                         #w = e[0][1] # the other vertex of the unmarked edge
                         else: ##Contract the blossom
                             print "\nBLOOOOOOOOOOSSSSSSSOOOOOOMMMMMMMMMM\n"
@@ -139,8 +140,8 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                             assert(len(blossom)%2 == 0)
 
                             # contract blossom into single node w
-                            contracted_G = G.copy()
-                            contracted_M = M.copy()
+                            contracted_G = copy.deepcopy(G)
+                            contracted_M = copy.deepcopy(M)
                             print "w is: ", w
                             for node in blossom[0:len(blossom)-1]:
                                 print "\t Blossom node: ", node
@@ -487,7 +488,7 @@ def finding_aug_path(G,M,Blossom_stack=[]):
     return Path ##Empty Path
 
 if __name__ == '__main__':
-    G = generate_random_graph(10,0.75)
+    G = generate_random_graph(6,0.75)
     M = nx.Graph()
     Blossom_stack = []
     print "This is our graph: ", list(G.edges())
