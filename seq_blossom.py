@@ -141,15 +141,13 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                             # contract blossom into single node w
                             contracted_G = G.copy()
                             contracted_M = M.copy()
-                            w_old = w + 0
                             print "w is: ", w
                             for node in blossom[0:len(blossom)-1]:
                                 print "\t Blossom node: ", node
-                                if node != w_old:
+                                if node != w:
                                     contracted_G = nx.contracted_nodes(contracted_G, w, node, self_loops=False)
                                     print "contracted", node, "into", w
                                     if node in contracted_M.nodes(): 
-                                       #contracted_M = nx.contracted_nodes(contracted_M, w, node, self_loops=False)
                                        print "removing", node, "from M"
                                        edge_rm = list(M.edges(node))[0] #this will be exactly one edge
                                        print "and also", edge_rm[1], "from M"
@@ -185,10 +183,6 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                             if (v_B in aug_path):
                                 #blossom.append(w) ### - WHY ARE WE DOING THIS???? w is inside the blossom anyway??
                                 print "Blossom_stack after pop: ", Blossom_stack
-
-                                # TODO  <-------- make changes here
-                                # find base of blossom <----------------MISTAKE HERE!!! 2 CASES: v_b is an endpoint of NOT
-
 
                                 ##Define the L_stem and R_stem
                                 L_stem = aug_path[0:aug_path.index(v_B)]
