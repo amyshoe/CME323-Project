@@ -160,6 +160,9 @@ def finding_aug_path(G,M,Blossom_stack=[]):
 
                             print "M:", list(M.nodes()),"\nContracted_M:", list(contracted_M.nodes())
                             print "M:", list(M.edges()),"\nContracted_M:", list(contracted_M.edges())
+                            print "LOOOOOKKK HHHHEEERRRREEEE: "
+                            print "G:", list(G.edges()),"\nContracted_G:", list(contracted_G.edges())
+
                             ## Go through the edges in the blossom and contract the ones in the matching
                             #for i in xrange(len(blossom)-1):
                             #    node = blossom[i]
@@ -242,6 +245,7 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                                             # find where Lstem is connected
                                             i = 1
                                             while (lifted_blossom == []):
+                                                print "THIS IS G: ", G.edges()
                                                 assert(i < len(based_blossom)-1)
                                                 if G.has_edge(based_blossom[i],L_stem[-1]):
                                                     # make sure we're adding the even part to lifted path
@@ -267,6 +271,7 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                                             # find where R_stem is connected
                                             i = 1
                                             while (lifted_blossom == []):
+                                                print "THIS IS G: ", G.edges()
                                                 assert(i < len(based_blossom)-1)
                                                 if G.has_edge(based_blossom[i],R_stem[0]):
                                                     # make sure we're adding the even part to lifted path
@@ -292,6 +297,7 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                                             # blossom needs to be lifted
                                             i = 1
                                             while (lifted_blossom == []):
+                                                print "THIS IS G: ", G.edges()
                                                 assert(i < len(based_blossom)-1)
                                                 if G.has_edge(based_blossom[i],R_stem[0]):
                                                     # make sure we're adding the even part to lifted path
@@ -314,6 +320,7 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                                             # blossom needs to be lifted
                                             i = 1
                                             while (lifted_blossom == []):
+                                                print "THIS IS G: ", G.edges()
                                                 assert(i < len(based_blossom)-1)
                                                 if G.has_edge(based_blossom[i],L_stem[-1]):
                                                     # make sure we're adding the even part to lifted path
