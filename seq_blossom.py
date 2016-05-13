@@ -13,10 +13,7 @@ def find_maximum_matching(G,M):
         ##Add the alternating edges of P to M
         for i in xrange(0,len(P)-2,2):
             M.add_edge(P[i],P[i+1])
-            if (M.has_edge(P[i+1],P[i+2])): ## <-----------------------------sketch central
-                M.remove_edge(P[i+1],P[i+2])
-            else:
-                print "warning..."
+            M.remove_edge(P[i+1],P[i+2])
         M.add_edge(P[-2],P[-1])
         print "M after adding path:", list(M.edges())
         return find_maximum_matching(G,M)
@@ -113,7 +110,6 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                     # Note: we don't add w to forest nodes b/c it's odd dist from root
                     assert(M.has_node(w))
                     print "Nodes of M: ", list(M.nodes())
-                    assert(list(M.edges(w)) != []) #<------------ sorry, I don't see why do we have this assertion?
                     print "Edges of M incident to w: ", list(M.edges(w))
                     edge_w = list(M.edges(w))[0] # get edge {w,x}
                     Forest[tree_num_of_v].add_edge(edge_w[0],edge_w[1]) # add edge{w,x}
@@ -269,18 +265,6 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                                 aug_path[aug_path.index(v_B)] = base
                                 print "basified aug path: ", aug_path
 
-                                ## massage into aug_path??????????? <------------------------------------------------sketch central
-                                for i in xrange(0,len(aug_path)-2,2):
-                                    M.add_edge(aug_path[i+1],aug_path[i+2])
-                                    if (M.has_edge(aug_path[i],aug_path[i+1])):
-                                        M.remove_edge(aug_path[i],aug_path[i+1])
-                                    else:
-                                        print "warning..."
-                                    # M.add_edge(aug_path[i],aug_path[i+1])
-                                    # assert(M.has_edge(aug_path[i+1],aug_path[i+2]))
-                                    # M.remove_edge(aug_path[i+1],aug_path[i+2])
-                                print "M after adding path:", list(M.edges())
-                                
                                 # lift - base (previously v_B) is the BLossom node
                                 
                                 # blossom is not L endpt
