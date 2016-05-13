@@ -37,7 +37,7 @@ def generate_random_graph(n,density=0.5):
     return graph 
     
 def finding_aug_path(G,M,Blossom_stack=[]):
-    print '-------------------------------\nfinding aug path was called\n G: ', list(G.nodes()), "\n M:", list(M.nodes())
+    print '-------------------------------\nfinding aug path was called\n G: ', list(G.nodes()), "\n M:", list(M.edges()),"\nBlossom Stack is:" ,Blossom_stack
     Forest = [] #Storing the Forests
     Path = [] # The final path 
 
@@ -113,7 +113,7 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                     # Note: we don't add w to forest nodes b/c it's odd dist from root
                     assert(M.has_node(w))
                     print "Nodes of M: ", list(M.nodes())
-                    assert(list(M.edges(w)) != [])
+                    assert(list(M.edges(w)) != []) #<------------ sorry, I don't see why do we have this assertion?
                     print "Edges of M incident to w: ", list(M.edges(w))
                     edge_w = list(M.edges(w))[0] # get edge {w,x}
                     Forest[tree_num_of_v].add_edge(edge_w[0],edge_w[1]) # add edge{w,x}
@@ -190,7 +190,19 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                                 #blossom.append(w) ### - WHY ARE WE DOING THIS???? w is inside the blossom anyway??
                                 print "Blossom_stack after pop: ", Blossom_stack
 
-                                # find base of blossom 
+                                # TODO  <-------- make changes here
+                                # find base of blossom <----------------MISTAKE HERE!!! 2 CASES: v_b is an endpoint of NOT
+
+
+                                ##Define the L_stem and R_stem
+                                L_stem = aug_path[0:aug_path.index(v_B)]
+                                R_stem = aug_path[aug_path.index(v_B)+1:]
+                                print "L_stem: ", L_stem
+                                print "R_stem: ", R_stem
+                                lifted_blossom = [] #stores the path within the blossom to take
+
+
+                                #CASE 1 : WHEN v_b is not an end point: the below code is correct
                                 i = 0
                                 base = None
                                 base_idx = -1
@@ -206,6 +218,36 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                                         i += 1
                                 print "Blossom is: ", blossom
                                 print "\tBlossom base is: ", base
+
+                                #CASE 2: when v_b is an end point: i.e. L_stem or R_stem is empty:
+                                ##Is this screwing things up??!!
+                                if L_stem ==[] or R_stem == []:
+                                    base = None
+                                    base_idx = None
+                                    if R_stem == []:
+                                        for i in xrange(0,len(blossom)-1):
+                                            if M.has_edge(blossom[i],blossom[i+1]) and G.has_edge(L_stem[-1],blossom[i]):
+                                                base_idx = i
+                                                base = blossom[i]
+
+
+                                        for i in xrange(len(blossom)-1,0,-1):
+                                            if M.has_edge(blossom[i],blossom[i-1]) and G.has_edge(L_stem[-1],blossom[i]):
+                                                base_idx = i
+                                                base = blossom[i]
+                                    else: 
+                                        for i in xrange(0,len(blossom)-1):
+                                            if M.has_edge(blossom[i],blossom[i+1]) and G.has_edge(R_stem[0],blossom[i]):
+                                                base_idx = i
+                                                base = blossom[i]
+
+
+                                        for i in xrange(len(blossom)-1,0,-1):
+                                            if M.has_edge(blossom[i],blossom[i-1]) and G.has_edge(R_stem[0],blossom[i]):
+                                                base_idx = i
+                                                base = blossom[i]
+
+
 
                                 # if needed, create list of blossom nodes starting at base
                                 if blossom[0] != base:
@@ -240,12 +282,7 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                                 print "M after adding path:", list(M.edges())
                                 
                                 # lift - base (previously v_B) is the BLossom node
-                                L_stem = aug_path[0:aug_path.index(base)]
-                                R_stem = aug_path[aug_path.index(base)+1:]
-                                print "L_stem: ", L_stem
-                                print "R_stem: ", R_stem
-                                lifted_blossom = [] #stores the path within the blossom to take
-
+                                
                                 # blossom is not L endpt
                                 if L_stem != []: 
                                     print "Blossom is not L endpt"
