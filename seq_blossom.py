@@ -155,7 +155,7 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                                        print "edge rm = ", edge_rm
                                        contracted_M.remove_node(node)
                                        contracted_M.remove_node(edge_rm[1])
-                                       assert(len(list(contracted_M.edges()))%2 == 0)
+                                       assert(len(list(contracted_M.nodes()))%2 == 0)
 
                             print "M:", list(M.nodes()),"\nContracted_M:", list(contracted_M.nodes())
                             print "M:", list(M.edges()),"\nContracted_M:", list(contracted_M.edges())
@@ -253,7 +253,7 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                                             return L_stem + list(reversed(lifted_blossom))
 
                                     else:
-                                        print "R is not empty, L is endpt"
+                                        print "R is not empty, L is empty"
                                         if G.has_edge(base, R_stem[0]):
                                             # CASE OH NO:
                                             if M.has_edge(base, R_stem[0]):
@@ -263,11 +263,11 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                                             return [base] + R_stem
                                         else:
                                             # CASE 2:
-                                            # find where Lstem is connected
+                                            # find where R_stem is connected
                                             i = 1
                                             while (lifted_blossom == []):
                                                 assert(i < len(based_blossom)-1)
-                                                if G.has_edge(based_blossom[i],R_stem[-0]):
+                                                if G.has_edge(based_blossom[i],R_stem[0]):
                                                     # make sure we're adding the even part to lifted path
                                                     if i%2 == 0: # same dir path
                                                         lifted_blossom = based_blossom[:i+1]
@@ -487,7 +487,7 @@ def finding_aug_path(G,M,Blossom_stack=[]):
     return Path ##Empty Path
 
 if __name__ == '__main__':
-    G = generate_random_graph(20,0.75)
+    G = generate_random_graph(10,0.75)
     M = nx.Graph()
     Blossom_stack = []
     print "This is our graph: ", list(G.edges())
