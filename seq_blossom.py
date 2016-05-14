@@ -226,6 +226,7 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                                     print "\tBlossom base-ified: ", based_blossom
                                     print "\toriginal Blossom is:", blossom 
                                 else:
+                                    print "It was already base-ified"
                                     based_blossom = blossom
 
                                 # CHECK IF BLOSSOM IS ENDPT
@@ -251,12 +252,12 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                                                 if G.has_edge(based_blossom[i],L_stem[-1]):
                                                     # make sure we're adding the even part to lifted path
                                                     if i%2 == 0: # same dir path
-                                                        lifted_blossom = list(reversed(based_blossom))[-i:]
+                                                        lifted_blossom = list(reversed(based_blossom))[-i-1:] ####################
                                                     else: # opposite dir path
-                                                        lifted_blossom = based_blossom[i:]
+                                                        lifted_blossom = based_blossom[i:]##########################
                                                 i += 1
-                                            print "Successful lifting: ", L_stem + list(reversed(lifted_blossom))
-                                            return L_stem + list(reversed(lifted_blossom))
+                                            print "Successful lifting: ", L_stem + (lifted_blossom)
+                                            return L_stem + lifted_blossom
 
                                     else:
                                         print "R is not empty, L is empty"
@@ -504,7 +505,7 @@ def finding_aug_path(G,M,Blossom_stack=[]):
     return Path ##Empty Path
 
 if __name__ == '__main__':
-    G = generate_random_graph(10,0.75)
+    G = generate_random_graph(100,0.75)
     M = nx.Graph()
     Blossom_stack = []
     print "This is our graph: ", list(G.edges())
