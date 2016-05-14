@@ -232,7 +232,7 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                                 if L_stem == [] or R_stem == []:
                                     print "Left or Right is empty"
                                     if L_stem != []:
-                                        print "Left is not empty, R is endpt"
+                                        print "Left is not empty, R is empty"
                                         if G.has_edge(base, L_stem[-1]):
                                             # CASE OH NO:
                                             if M.has_edge(base, L_stem[-1]):
@@ -246,13 +246,14 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                                             i = 1
                                             while (lifted_blossom == []):
                                                 print "THIS IS G: ", G.edges()
+                                                print "searching for this:", (based_blossom[i],L_stem[-1])
                                                 assert(i < len(based_blossom)-1)
                                                 if G.has_edge(based_blossom[i],L_stem[-1]):
                                                     # make sure we're adding the even part to lifted path
                                                     if i%2 == 0: # same dir path
-                                                        lifted_blossom = based_blossom[:i+1]
+                                                        lifted_blossom = list(reversed(based_blossom))[-i:]
                                                     else: # opposite dir path
-                                                        lifted_blossom = list(reversed(based_blossom[:i-1]))
+                                                        lifted_blossom = based_blossom[i:]
                                                 i += 1
                                             print "Successful lifting: ", L_stem + list(reversed(lifted_blossom))
                                             return L_stem + list(reversed(lifted_blossom))
@@ -272,13 +273,15 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                                             i = 1
                                             while (lifted_blossom == []):
                                                 print "THIS IS G: ", G.edges()
+                                                print "searching for this:",(based_blossom[i],R_stem[-0])
                                                 assert(i < len(based_blossom)-1)
                                                 if G.has_edge(based_blossom[i],R_stem[0]):
                                                     # make sure we're adding the even part to lifted path
                                                     if i%2 == 0: # same dir path
                                                         lifted_blossom = based_blossom[:i+1]
+                                                        print lifted_blossom
                                                     else: # opposite dir path
-                                                        lifted_blossom = list(reversed(based_blossom[:i-1]))
+                                                        lifted_blossom = list(reversed(based_blossom))[:-i]
                                                 i += 1
                                             print "Successful lifting: ", lifted_blossom + R_stem
                                             return lifted_blossom + R_stem
@@ -298,13 +301,18 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                                             i = 1
                                             while (lifted_blossom == []):
                                                 print "THIS IS G: ", G.edges()
+                                                print "searching for this:", (based_blossom[i],R_stem[-0])
                                                 assert(i < len(based_blossom)-1)
                                                 if G.has_edge(based_blossom[i],R_stem[0]):
+                                                    print "found the edge man!!!!"
                                                     # make sure we're adding the even part to lifted path
                                                     if i%2 == 0: # same dir path
-                                                        lifted_blossom = based_blossom[:i+1]
+                                                        lifted_blossom = based_blossom[:i+1] ##########################################################
+                                                        print lifted_blossom
                                                     else: # opposite dir path
-                                                        lifted_blossom = list(reversed(based_blossom[:i-1]))
+                                                        lifted_blossom = list(reversed(based_blossom))[:-i]
+                                                        print lifted_blossom
+
                                                 i += 1
                                             print "Successful lifting: ", L_stem + lifted_blossom + R_stem
                                             return L_stem + lifted_blossom + R_stem
@@ -321,16 +329,17 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                                             i = 1
                                             while (lifted_blossom == []):
                                                 print "THIS IS G: ", G.edges()
+                                                print "searching for this:", (based_blossom[i],L_stem[-1])
                                                 assert(i < len(based_blossom)-1)
                                                 if G.has_edge(based_blossom[i],L_stem[-1]):
                                                     # make sure we're adding the even part to lifted path
                                                     if i%2 == 0: # same dir path
-                                                        lifted_blossom = based_blossom[:i+1]
+                                                        lifted_blossom = list(reversed(based_blossom))[-i-1:] ##########################################################
                                                     else: # opposite dir path
-                                                        lifted_blossom = list(reversed(based_blossom[:i-1]))
+                                                        lifted_blossom = based_blossom[i:] ##########################################################
                                                 i += 1
                                             print "Successful lifting: ", L_stem + list(reversed(lifted_blossom)) + R_stem
-                                            return L_stem + list(reversed(lifted_blossom)) + R_stem
+                                            return L_stem + list((lifted_blossom)) + R_stem
 
 
 #############################################################################
@@ -495,7 +504,7 @@ def finding_aug_path(G,M,Blossom_stack=[]):
     return Path ##Empty Path
 
 if __name__ == '__main__':
-    G = generate_random_graph(6,0.75)
+    G = generate_random_graph(10,0.75)
     M = nx.Graph()
     Blossom_stack = []
     print "This is our graph: ", list(G.edges())
