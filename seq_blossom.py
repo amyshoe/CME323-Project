@@ -12,7 +12,7 @@ def find_maximum_matching(G,M):
         print " P is:",P,"\n M is :"#, list(M.edges())
 
         ##Add the alternating edges of P to M
-        for i in xrange(0,len(P)-2,2):
+        for i in xrange(0,len(P)-2,2): #Parallel For
             M.add_edge(P[i],P[i+1])
             M.remove_edge(P[i+1],P[i+2])
         M.add_edge(P[-2],P[-1])
@@ -54,7 +54,7 @@ def finding_aug_path(G,M,Blossom_stack=[]):
     
     counter = 0
     #List of trees with the exposed vertices as the roots
-    for v in exp_vertex:
+    for v in exp_vertex:  #<------------ Completely PARALLEL For loop -----change counter to the index of v in exp_vertex
         temp = nx.Graph()
         temp.add_node(v)
         Forest.append(temp)
@@ -66,11 +66,11 @@ def finding_aug_path(G,M,Blossom_stack=[]):
         counter = counter + 1
 
     
-    for v in Forest_nodes: 
+    for v in Forest_nodes:  ## <----------- we cant trivially change this...
         print "The nodes in Forest are:" #,Forest_nodes
         root_of_v = None
         tree_num_of_v = None
-        for tree_number in xrange(len(Forest)):
+        for tree_number in xrange(len(Forest)): ## <------- completely parallel : figuring out the tree of v
             tree_in = Forest[tree_number]
             if tree_in.has_node(v) == True:
                 root_of_v = tree_to_root[tree_number]
@@ -80,7 +80,7 @@ def finding_aug_path(G,M,Blossom_stack=[]):
         edges_v = list(G.edges(v))
         print "edges of v: "#, edges_v
         print "the length of edges_v list is:" ,len(edges_v)
-        for edge_number in xrange(len(edges_v)):
+        for edge_number in xrange(len(edges_v)): ## <--------  we can DO this!!! NON Triviall
             e = edges_v[edge_number]
             e2 = (e[1],e[0]) #the edge in the other order
             print "\tConsidering the edge", e
