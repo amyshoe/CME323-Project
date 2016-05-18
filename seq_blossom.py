@@ -347,16 +347,21 @@ def finding_aug_path(G,M,Blossom_stack=[]):
     return Path ##Empty Path
 
 if __name__ == '__main__':
-    G = generate_random_graph(40,0.75)
+    G = generate_random_graph(10,0.15)
     M = nx.Graph()
     Blossom_stack = []
-    print "This is our graph: "#, list(G.edges())
+    # print "This is our graph: ", list(G.edges())
     MM = find_maximum_matching(G, M)
     print "Here it is M edges:", list(MM.edges())
     print "Matching has ", MM.number_of_edges(), "edges, covering ", MM.number_of_nodes(), "nodes."
-    if MM.number_of_nodes() == MM.number_of_nodes():
+    if MM.number_of_nodes() == G.number_of_nodes():
         print "We found a perfect matching!"
-    
+    for edge in list(MM.edges()):
+        if G.has_edge(edge[0], edge[1]):
+            print "Good"
+        else:
+            print "baaad boy"
+    print list(G.edges())
 
                     
                             
