@@ -100,7 +100,9 @@ def finding_aug_path(G,M,Blossom_stack=[]):
         ##check for blossoms of 3-length
         for i in xrange(len(temp)):
             if temp[i][0] == 1 and G.has_edge(v,temp[i][1][1]):
-                #contract len 3 blossom
+
+                ########################################## case 1 -> blossom ############################
+
                 w = temp[i][1][0]                
                 blossom = [v,w,temp[i][1][1],v]
                 contracted_G = copy.deepcopy(G)
@@ -120,10 +122,6 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                            contracted_M.remove_node(node)
                            contracted_M.remove_node(edge_rm[1])
                            assert(len(list(contracted_M.nodes()))%2 == 0)
-
-                    # print "M:", list(M.nodes()),"\nContracted_M:", list(contracted_M.nodes())
-                    # print "M:", list(M.edges()),"\nContracted_M:", list(contracted_M.edges())
-                    # print "G:", list(G.edges()),"\nContracted_G:", list(contracted_G.edges())
 
                 print "out of the for LOOP"
                 # add blossom to our stack
@@ -306,13 +304,6 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                 Forest[tree_num_of_v].add_edge(temp[i][1][0],temp[i][1][1])
                 Forest_nodes.append(temp[i][1][1])
 
-                
-
-            
-        
-                
-        
-            
     return [] #Empty Path
     
     
