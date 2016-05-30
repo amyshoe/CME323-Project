@@ -322,9 +322,9 @@ def edge_function(G,M,Forest,unmarked_edges,tree_to_root,tree_num_of_v,root_of_v
     print "beginning of pool"
     e2 = (e[1],e[0]) #the edge in the other order
     print e,"checked edge"
-    print G.nodes()
+    print list(G.nodes())
     print "checked G"
-    print Forest[0].nodes()
+    print list(Forest[0].nodes())
     print "checked Forest"
     print unmarked_edges
     print len(tree_to_root)
