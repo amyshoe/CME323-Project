@@ -10,7 +10,7 @@ import networkx as nx
 import numpy as np
 import copy
 from multiprocessing import Pool
-
+from functools import partial
 
 def find_maximum_matching(G,M):
     P = finding_aug_path(G,M)
@@ -45,7 +45,7 @@ def generate_random_graph(n,density=0.5):
     
 def finding_aug_path(G,M,Blossom_stack=[]):
     print '-------------------------------\nfinding aug path was called\n G: '#, list(G.nodes()), "\n M:", list(M.edges()),"\nBlossom Stack is:" ,Blossom_stack
-    Forest = [] #Storing the Forests
+    Forest = [] #Storing the Forests -------Noo Warm Start!!! :'('
     Path = [] # The final path 
 
     unmarked_edges = list(set(G.edges()) - set(M.edges()))
@@ -85,24 +85,29 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                 root_of_v = tree_to_root[tree_number]
                 tree_num_of_v = tree_number
                 break #Break out of the for loop
-        print "here's v: ", v
         edges_v = list(G.edges(v))
-        print "edges of v: "#, edges_v
-        print "the length of edges_v list is:" ,len(edges_v)
-        pool = Pool(processes =4)
+        pool = Pool(processes =2)
         edge_data = edges_v
-        
-        temp = pool.map(edge_function, edge_data)
-        
+        print "Before going to pool printing stuff"
+        print G.nodes(),M.nodes(),Forest[0].nodes()
+        partial_edge = partial(edge_function,G,M,Forest,unmarked_edges,tree_to_root,tree_num_of_v,root_of_v,v)
+
+
+        print "About to call POOL"
+        temp = pool.map(partial_edge, edge_data)
+        print "DONE WITH POOL STUFF"
+        #pool.closeall()
+        pool.terminate()
+        print "POST TERMINATION"
+
         for i in xrange(len(temp)):
             if temp[i][0] == 2 or temp[i][0]:
                 return temp[i][1]
+
         ##check for blossoms of 3-length
         for i in xrange(len(temp)):
             if temp[i][0] == 1 and G.has_edge(v,temp[i][1][1]):
-
-                ########################################## case 1 -> blossom ############################
-
+                #contract len 3 blossom
                 w = temp[i][1][0]                
                 blossom = [v,w,temp[i][1][1],v]
                 contracted_G = copy.deepcopy(G)
@@ -112,18 +117,17 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                     print "\t Blossom node: ", node
                     if node != w:
                         contracted_G = nx.contracted_nodes(contracted_G, w, node, self_loops=False)
-                        print "contracted", node, "into", w
                         if node in contracted_M.nodes(): 
                            print "removing", node, "from M"
                            edge_rm = list(M.edges(node))[0] #this will be exactly one edge
-                           print "and also", edge_rm[1], "from M"
-                           print "SINGLE EDGE: edges = "#, list(M.edges(node))
-                           print "edge rm = ", edge_rm
                            contracted_M.remove_node(node)
                            contracted_M.remove_node(edge_rm[1])
                            assert(len(list(contracted_M.nodes()))%2 == 0)
 
-                print "out of the for LOOP"
+                    # print "M:", list(M.nodes()),"\nContracted_M:", list(contracted_M.nodes())
+                    # print "M:", list(M.edges()),"\nContracted_M:", list(contracted_M.edges())
+                    # print "G:", list(G.edges()),"\nContracted_G:", list(contracted_G.edges())
+
                 # add blossom to our stack
                 Blossom_stack.append(w)
                 print "Blossom_stack after contraction: ", Blossom_stack
@@ -304,11 +308,27 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                 Forest[tree_num_of_v].add_edge(temp[i][1][0],temp[i][1][1])
                 Forest_nodes.append(temp[i][1][1])
 
+
+
+            
+        
+                
+        
+            
     return [] #Empty Path
     
-    
-def edge_function(e):
+#######################################################################################################################################################    
+def edge_function(G,M,Forest,unmarked_edges,tree_to_root,tree_num_of_v,root_of_v,v,e):
+    print "beginning of pool"
     e2 = (e[1],e[0]) #the edge in the other order
+    print e,"checked edge"
+    print G.nodes()
+    print "checked G"
+    print Forest[0].nodes()
+    print "checked Forest"
+    print unmarked_edges
+    print len(tree_to_root)
+    print "------------------------------------------------------"
     print "\tConsidering the edge", e
     if ((e in unmarked_edges or e2 in unmarked_edges) and e!=[]):
         w = e[1] # the other vertex of the unmarked edge
@@ -571,7 +591,7 @@ def edge_function(e):
 
     
 if __name__ == '__main__':
-    G = generate_random_graph(10,0.15)
+    G = generate_random_graph(6,1)
     M = nx.Graph()
     Blossom_stack = []
     # print "This is our graph: ", list(G.edges())
@@ -585,7 +605,7 @@ if __name__ == '__main__':
             print "Good"
         else:
             print "baaad boy"
-    print list(G.edges())
+    print "edges of G:", list(G.edges())
 
                     
                             
