@@ -101,11 +101,12 @@ def finding_aug_path(G,M,Blossom_stack=[]):
         print "POST TERMINATION"
 
         for i in xrange(len(temp)):
-            if temp[i][0] == 2 or temp[i][0]:
+            if temp[i][0] == 2 or temp[i][0] ==3:
                 return temp[i][1]
-
+        print "Not CASE 2 & 3"
         ##check for blossoms of 3-length
         for i in xrange(len(temp)):
+            print "checking BLOSSOMS 3-length"
             if temp[i][0] == 1 and G.has_edge(v,temp[i][1][1]):
                 #contract len 3 blossom
                 w = temp[i][1][0]                
@@ -368,6 +369,8 @@ def edge_function(G,M,Forest,unmarked_edges,tree_to_root,tree_num_of_v,root_of_v
         else: ## w is in Forest
             print "w in Forest"
             # if odd, do nothing.
+            if dist_to_root(w,root_of_w,Forest[tree_num_of_w])%2 == 1:#CASE -4
+                return (4,0)
             if dist_to_root(w,root_of_w,Forest[tree_num_of_w])%2 == 0:
                 print "dist to root is even"
                 if (tree_num_of_v != tree_num_of_w):
@@ -591,7 +594,7 @@ def edge_function(G,M,Forest,unmarked_edges,tree_to_root,tree_num_of_v,root_of_v
 
     
 if __name__ == '__main__':
-    G = generate_random_graph(6,1)
+    G = generate_random_graph(60,0.5)
     M = nx.Graph()
     Blossom_stack = []
     # print "This is our graph: ", list(G.edges())
