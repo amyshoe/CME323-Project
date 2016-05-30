@@ -347,7 +347,7 @@ def finding_aug_path(G,M,Blossom_stack=[]):
     return Path ##Empty Path
 
 if __name__ == '__main__':
-    G = generate_random_graph(10,0.15)
+    G = generate_random_graph(10,0.5)
     M = nx.Graph()
     Blossom_stack = []
     # print "This is our graph: ", list(G.edges())
