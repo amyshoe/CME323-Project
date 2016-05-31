@@ -12,7 +12,7 @@ def find_maximum_matching(G,M):
     else: #Augment P to M
 
         ##Add the alternating edges of P to M
-        for i in xrange(0,len(P)-2,2): #Parallel For
+        for i in xrange(0,len(P)-2,2): ######## could be parallelized
             M.add_edge(P[i],P[i+1])
             M.remove_edge(P[i+1],P[i+2])
         M.add_edge(P[-2],P[-1])
