@@ -87,11 +87,11 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                 tree_num_of_v = tree_number
                 break #Break out of the for loop
         edges_v = list(G.edges(v))
-        pool = Pool(processes =2)
+        pool = Pool(processes = 4)
         edge_data = edges_v
         # print "Before going to pool printing stuff"
         # print G.nodes(),M.nodes(),Forest[0].nodes()
-        partial_edge = partial(edge_function,G,M,Forest,unmarked_edges,tree_to_root,tree_num_of_v,root_of_v,v)
+        partial_edge = partial(edge_function,G,M,Forest,unmarked_edges,tree_to_root,tree_num_of_v,root_of_v,v,Blossom_stack)
 
 
         # print "About to call POOL"
@@ -102,13 +102,13 @@ def finding_aug_path(G,M,Blossom_stack=[]):
         # print "POST TERMINATION"
 
         for i in xrange(len(temp)):
-            if temp[i][0] == 2 or temp[i][0] == 3:
+            if temp[i] != None and (temp[i][0] == 2 or temp[i][0] == 3):
                 return temp[i][1]
         # print "Not CASE 2 & 3"
         ##check for blossoms of 3-length
         for i in xrange(len(temp)):
             # print "checking BLOSSOMS 3-length"
-            if temp[i][0] == 1 and G.has_edge(v,temp[i][1][1]):
+            if temp[i] != None and (temp[i][0] == 1 and G.has_edge(v,temp[i][1][1])):
                 #contract len 3 blossom
                 w = temp[i][1][0]                
                 blossom = [v,w,temp[i][1][1],v]
@@ -305,7 +305,7 @@ def finding_aug_path(G,M,Blossom_stack=[]):
                         
    ########################################## case 1 -> blossom ############################
         for i in xrange(len(temp)):
-            if temp[i][0] ==1:
+            if temp[i] != None and temp[i][0] ==1:
                 Forest[tree_num_of_v].add_edge(v,temp[i][1][0])
                 Forest[tree_num_of_v].add_edge(temp[i][1][0],temp[i][1][1])
                 Forest_nodes.append(temp[i][1][1])
@@ -313,7 +313,7 @@ def finding_aug_path(G,M,Blossom_stack=[]):
     return [] #Empty Path
     
 #######################################################################################################################################################    
-def edge_function(G,M,Forest,unmarked_edges,tree_to_root,tree_num_of_v,root_of_v,v,e):
+def edge_function(G,M,Forest,unmarked_edges,tree_to_root,tree_num_of_v,root_of_v,v,Blossom_stack,e):
     # print "beginning of pool"
     e2 = (e[1],e[0]) #the edge in the other order
     # print e,"checked edge"
@@ -588,27 +588,31 @@ def edge_function(G,M,Forest,unmarked_edges,tree_to_root,tree_num_of_v,root_of_v
 
     
 if __name__ == '__main__':
-    n = 80
-    d = 0.85
-    G = generate_random_graph(n,d)
-    M = nx.Graph()
-    Blossom_stack = []
-    # print "This is our graph: ", list(G.edges())
-    a = time.time()
-    MM = find_maximum_matching(G, M)
-    b = time.time()
-    # print "Here it is M edges:", list(MM.edges())
-    print "Matching has ", MM.number_of_edges(), "edges, covering ", MM.number_of_nodes(), "nodes."
-    if MM.number_of_nodes() == G.number_of_nodes():
-        print "We found a perfect matching!"
-    print "Number of nodes: ", n, "\t Density: ", d
-    print "Time elapsed: ", b - a
-    # for edge in list(MM.edges()):
-    #     if G.has_edge(edge[0], edge[1]):
-    #         print "Good"
-    #     else:
-    #         print "baaad boy"
-    # print "edges of G:", list(G.edges())
+    n_list = [20, 50, 100, 150, 200]
+    d_list = [0.3, 0.5, 0.7, 0.9]
+    results = np.ndarray((len(d_list),len(n_list)))
+    for i in range(5):
+        for n in n_list:
+            for d in d_list:
+                G = generate_random_graph(n,d)
+                M = nx.Graph()
+                Blossom_stack = []
+                # print "This is our graph: ", list(G.edges())
+                a = time.time()
+                MM = find_maximum_matching(G, M)
+                b = time.time()
+                # print "Here it is M edges:", list(MM.edges())
+                # print "Matching has ", MM.number_of_edges(), "edges, covering ", MM.number_of_nodes(), "nodes."
+                # if MM.number_of_nodes() == G.number_of_nodes():
+                    # print "We found a perfect matching!"
+                # print "Number of nodes: ", n, "\t Density: ", d
+                # print "Time elapsed: ", b - a
+                results[d_list.index(d)][n_list.index(n)] += b - a
+
+    results *= 0.2
+    print results
+
+    np.save("par_results", results)
 
                     
                             

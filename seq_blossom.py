@@ -7,7 +7,7 @@ import time
 def find_maximum_matching(G,M):
     P = finding_aug_path(G,M)
     if P == []:#Base Case
-        print "Base Case: " #, list(M.edges()) 
+        # print "Base Case: " #, list(M.edges()) 
         return M
     else: #Augment P to M
         #print " P is:",P,"\n M is :"#, list(M.edges())
@@ -348,21 +348,33 @@ def finding_aug_path(G,M,Blossom_stack=[]):
     return Path ##Empty Path
 
 if __name__ == '__main__':
-    n = 100
-    d = 0.5
-    G = generate_random_graph(n,d)
-    M = nx.Graph()
-    Blossom_stack = []
-    a = time.time()
-    # print "This is our graph: ", list(G.edges())
-    MM = find_maximum_matching(G, M)
-    b = time.time()
-    print "Number of nodes: ", n, "\t Density: ", d
-    print "Time elapsed:", (b-a)
-    # print "Here it is M edges:", list(MM.edges())
-    # print "Matching has ", MM.number_of_edges(), "edges, covering ", MM.number_of_nodes(), "nodes."
-    if MM.number_of_nodes() == G.number_of_nodes():
-        print "We found a perfect matching!"
+     n_list = [20, 50, 100, 150, 200]
+    d_list = [0.3, 0.5, 0.7, 0.9]
+
+    results = np.ndarray((len(d_list),len(n_list)))
+    for i in range(5):
+        for n in n_list:
+            for d in d_list:
+                G = generate_random_graph(n,d)
+                M = nx.Graph()
+                Blossom_stack = []
+                a = time.time()
+                # print "This is our graph: ", list(G.edges())
+                MM = find_maximum_matching(G, M)
+                b = time.time()
+                # print "Number of nodes: ", n, "\t Density: ", d
+                # print "Time elapsed:", (b-a)
+                # # print "Here it is M edges:", list(MM.edges())
+                # # print "Matching has ", MM.number_of_edges(), "edges, covering ", MM.number_of_nodes(), "nodes."
+                # if MM.number_of_nodes() == G.number_of_nodes():
+                #     print "We found a perfect matching!"
+                results[d_list.index(d)][n_list.index(n)] += b - a
+
+    
+    results *= 0.2
+    print results
+
+    np.save("seq_results", results)
     # for edge in list(MM.edges()):
     #     if G.has_edge(edge[0], edge[1]):
     #         print "Good"
@@ -372,4 +384,3 @@ if __name__ == '__main__':
 
                     
                             
-        
