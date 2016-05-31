@@ -433,7 +433,7 @@ def edge_function(G,M,Forest,unmarked_edges,tree_to_root,tree_num_of_v,root_of_v
 if __name__ == '__main__':
     n_list = [20, 50, 100, 150, 200]
     d_list = [0.3, 0.5, 0.7, 0.9]
-    niter = 1
+    niter = 5
 
     results = np.ndarray((len(d_list),len(n_list)))
     results.fill(0)
